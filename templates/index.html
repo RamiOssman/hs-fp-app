@@ -14,7 +14,7 @@
 
     <script>
         $(function(){
-            $('form').on('submit', function(){
+            $('#o').on('click', function(){
                 $.ajax({
                     type: "POST",
                     url: "{{ url_for('process_user_query') }}",
@@ -24,49 +24,7 @@
                         query: $('textarea[name="q"]').val()
                     })
                 }).done(function (response) {
-                    $('div.result-area').html('');
-                    if(response && response.pop) {
-                        var $list = $('<ol></ol>').addClass('list-group');
-                        $('div.result-area').append($list);
-                        $.each(response, function(i, item){
-                            $list.append(
-                                $('<li></li>')
-                                    .addClass('card-body list-group-item')
-                                    .append(
-                                        $('<code></code>')
-                                            .text(item.toString())
-                                    )
-                            );
-                        });
-                    }
-                    else if(typeof(response) == "string") {
-                        $('div.result-area').append(
-                            $('<pre></pre>')
-                                .append($('<code></code>').text(response.toString()))
-                        )
-                    }
-                    else {
-                        var $tbody = $('<tbody></tbody>');
-                        var $table = $('<table></table>').addClass('table').append($tbody);
-
-                        for(p in response){
-                            $tbody.append(
-                                $('<tr></tr>')
-                                    .append(
-                                        $('<td></td>').text(p.toString())
-                                    )
-                                    .append(
-                                        $('<td></td>').append(
-                                            $('<pre></pre>').append(
-                                                $('<code></code>')
-                                                    .text(response[p].toString())
-                                            )
-                                        )
-                                    )
-                            )
-                        }
-                        $('div.result-area').append($table);
-                    }
+                    $('div.result-area').html(response);
                 }).fail(function (error) {
                     $('div.result-area').html('Looks like an error happened while processing your request. It can be an error in backend or lost connection.');
                     console.log(error);
@@ -85,10 +43,45 @@
                     <div class="form-group">
                     <label for="mainTextArea">Type your request here:</label>
                     <textarea id="mainTextArea" class="form-control" name="q"></textarea>
-                    </div>
-                    <div class="form-group">
-                    <button class="btn btn-outline-secondary" type="submit">Submit</button>
-                    </div>
+                  </div>
+
+
+                  <div id='addedbyRami'>
+                    <style>
+                    #ul_top_hypers li{
+                      display: inline;
+                    }
+                    li{
+                      padding-right: 40px;
+                      cursor: pointer;
+                    }
+                    img{
+                      width: 20px;
+                    }
+                    </style><center>
+                    <ul id="ul_top_hypers">
+                      <li id='b' onclick="add(this)"><img src="{{url_for('static', filename='bold.png')}}" /></li>
+                      <li id='i' onclick="add(this)"><img src="{{url_for('static', filename='italic.png')}}"  /></li>
+                      <li id='u' onclick="add(this)"><img src="{{url_for('static', filename='underline.png')}}"  /></li>
+                      <li id='c' onclick="add(this)"><img src="{{url_for('static', filename='code.png')}}"  /></li>
+                      <li id='l' onclick="add(this)"><img src="{{url_for('static', filename='left-alignment.png')}}"  /></li>
+                      <li id='e' onclick="add(this)"><img src="{{url_for('static', filename='center-alignment.png')}}"  /></li>
+                      <li id='r' onclick="add(this)"><img src="{{url_for('static', filename='right-alignment.png')}}"  /></li>
+                      <li id='d' onclick="add(this)"><img src="{{url_for('static', filename='photo.png')}}"  /></li>
+                      <li id='o' ><img src="{{url_for('static', filename='download.png')}}"  /></li>
+                    </ul></center>
+                    <script>
+                    function add(liEl){
+                        var textArea = $("#mainTextArea");
+                        textArea.val(textArea.val()+"*"+liEl.id+"* Write Here **"+liEl.id+"** ")
+                    }
+                    function download(){
+                      alert("Download it by yourself: \n\n"+$('div.result-area').html())
+                    }
+                    </script>
+                  </div>
+
+
                 </form>
             </div>
         </div>
