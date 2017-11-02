@@ -2,46 +2,64 @@
 import json
 
 def process_user_query(h):
-    retrn = ''
-    code =  h.split("**")
-    if len(code) == 1:
+    if "*" not in h:
         return h
-    for i in range(0,len(code)-1,2):
-        text = code[i].split("*"+code[i+1]+"*")[1]
-        retrn+=STH(text, code[i+1])
-    return retrn
+    t = ''
+    cut1 = h[h.index("*")+1:len(h)]
+    key  = cut1[0]
+    cut2 = cut1[1:cut1.index(key+"*")]
+    t+= STH(cut2 , key)
+    h = h.replace("*"+key+cut2+key+"*" , "")
+    return t+decode(h , 1)
+
 
 def test(h):
-    complete = ''
-    code = h.split("*")
-    for i,c in enumerate(code):
-        if i !=len(code)-1:
-            if c.strip(" ") == "":
-                continue
-        else:
-            c = c.strip()
-            key = c[0]
-            print(c.strip() , end="\n")
+    return h.index("your")
 
-    return complete
+def decode(h, x):
+    if "*" not in h:
+        return h
+    t = ''
+    cut1 = h[h.index("*")+1:len(h)]
+    key  = cut1[0]
+    cut2 = cut1[1:cut1.index(key+"*")]
+    t+= STH(cut2 , key)
+    h = h.replace("*"+key+cut2+key+"*" , "")
+    if x == 1:
+        return t+decode(h , 1)
+    if x == 2:
+        return decode(h , 1)+t
 
-##### SCRIPT TO HTML
+#### SCRIPT TO HTML
 def STH(C , k):
+    C = decode(C , 2)
+    att = ''
+    while "@" in C:
+        type = C[C.index("@")+1]
+        if type == 's':
+            att+='font-size:'+C[C.index("@")+3:C.index("@")+5]+'px;'
+            C = C.replace(C[C.index("@"):C.index("@")+5] , '')
+        if type == 'c':
+            att+='color:#'+C[C.index("@")+3:C.index("@")+9]+';'
+            C = C.replace(C[C.index("@"):C.index("@")+9] , '')
+        if "@" not in C:
+            att = " style='"+att+"' "
     if k == 'b':
-        return "<b>"+C+"</b>"
+        return "<b "+ att+" >"+C+"</b>"
     if k == 'i':
-        return "<i>"+C+"</i>"
+        return "<i "+ att+" >"+C+"</i>"
     if k == 'u':
-        return "<u>"+C+"</u>"
+        return "<u "+ att+" >"+C+"</u>"
     if k == 'c':
-        return "</br><code style='background-color:#eff0f1;color:black;'>"+C+"</code>"
+        return "</br><code  "+ att+" style='background-color:#eff0f1;'>"+C+"</code>"
     if k == 'l':
-        return "<p style='text-align: left;'>"+C+"</p>"
+        return "<p  "+ att+" style='text-align: left;'>"+C+"</p>"
     if k == 'e':
-        return "<p style='text-align: center;'>"+C+"</p>"
+        return "<p  "+ att+" style='text-align: center;'>"+C+"</p>"
     if k == 'r':
-        return "<p style='text-align: right;'>"+C+"</p>"
+        return "<p "+ att+"  style='text-align: right;'>"+C+"</p>"
     if k == 'd':
-        return "<img style='width:600px' src='"+C+"'></img>"
+        return "<img "+ att+"  style='width:600px' src='"+C+"'></img>"
 
-#print(test("*d your_d_text *e your_e_text e*     d*   *e your_e_here *e"))
+text = "*b @s:13 @c:RRGGBB something else *i italic i* b* *b here b*"
+print(process_user_query(text))
